@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+  <information>
+    <name>Signal Ayu Unified Light/Dark</name>
+    <version>2.0.2</version>
+    <description>
+      <![CDATA[
+      Signal over Noise의 Ayu Inspired 테마입니다.
+      티스토리 기본 #1 스킨 구조는 유지하고, 색상 토큰을 “통일형(라이트/다크 동일 의미)”으로 재정리했습니다.
+      - 라이트/다크 전환 지원
+      - 본문 가독성 우선(타이포/간격은 최소 변경)
+      - 코드블록/인라인코드/인용/테이블/댓글 등 핵심 UI 색상 일관화
+      ]]>
+    </description>
+    <license>
+      <![CDATA[
+      MIT License (Base: Tistory #1 Skin / Modifications: ceak)
+      ]]>
+    </license>
+  </information>
+
+  <author>
+    <name>ceak</name>
+    <homepage>https://ceak.tistory.com</homepage>
+    <email>ceak@daum.net</email>
+  </author>
+
+  <!-- 기본 #1 스킨 정보를 참고용으로 남겨두고 싶으면 유지 -->
+  <contest>
+    <description>티스토리 기본 #1 스킨 기반(2015 반응형 스킨 공모전 기념 스킨)</description>
+    <preview>//t1.daumcdn.net/tistory_admin/static/admin/new/skin_preview_ray.png</preview>
+    <document>http://notice.tistory.com/2271</document>
+  </contest>
+
+  <default>
+    <!-- 사이드/하단 위젯 성격의 기본 개수 -->
+    <recentEntries>4</recentEntries>
+    <recentComments>4</recentComments>
+    <recentTrackbacks>4</recentTrackbacks>
+
+    <!-- 방명록/태그 기본 노출량 -->
+    <itemsOnGuestbook>10</itemsOnGuestbook>
+    <tagsInCloud>30</tagsInCloud>
+    <sortInCloud>3</sortInCloud>
+
+    <!-- 댓글/트랙백 기본 동작 -->
+    <expandComment>1</expandComment>
+    <commentMessage>
+      <none>0</none>
+      <single>1</single>
+    </commentMessage>
+    <trackbackMessage>
+      <none>0</none>
+      <single>1</single>
+    </trackbackMessage>
+
+    <!-- 각 리스트의 제목 길이(말줄임 기준) -->
+    <lengthOfRecentNotice>25</lengthOfRecentNotice>
+    <lengthOfRecentEntry>27</lengthOfRecentEntry>
+    <lengthOfRecentComment>30</lengthOfRecentComment>
+    <lengthOfRecentTrackback>30</lengthOfRecentTrackback>
+    <lengthOfLink>30</lengthOfLink>
+
+    <!-- 카테고리/아카이브 목록 노출 방식 -->
+    <showListOnCategory>1</showListOnCategory>
+    <showListOnArchive>1</showListOnArchive>
+    <showListLock>1</showListLock>
+
+    <!-- 카테고리 트리 기본 색(스킨 편집 UI에서 참고되는 값) -->
+    <tree>
+      <color>0F1419</color>
+      <bgColor>FAFAFA</bgColor>
+      <activeColor>0F1419</activeColor>
+      <activeBgColor>F3F4F6</activeBgColor>
+      <labelLength>27</labelLength>
+      <showValue>1</showValue>
+    </tree>
+
+    <!-- #1 스킨 기본 본문 폭 유지 -->
+    <contentWidth>820</contentWidth>
+  </default>
+</skin>
