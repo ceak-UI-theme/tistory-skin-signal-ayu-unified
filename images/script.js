@@ -16,7 +16,12 @@
 
 		var init = function() {
 			$areaSkin.on("click", ".btn_menu", openMenu);
-			$areaSkin.on("click", ".btn_close", closeMenu);
+			$areaSkin.on("click", ".btn_close, .dimmed_layer", closeMenu);
+			$(document).on("keydown", function(e) {
+				if (e.key === "Escape") {
+					closeMenu();
+				}
+			});
 		};
 
 		return {
@@ -86,10 +91,6 @@
 		var $btnOpen = $(".btn_reply"),
 			$fieldReply = $(".fld_reply");
 
-		var changeStatus = function() {
-			$btnOpen.toggleClass("on");
-		};
-
 		var init = function() {
 			if ($fieldReply.is(":visible")) {
 				$btnOpen.addClass("on");
@@ -97,8 +98,7 @@
 		};
 
 		return {
-			init: init,
-			changeStatus: changeStatus
+			init: init
 		}
 	})();
 

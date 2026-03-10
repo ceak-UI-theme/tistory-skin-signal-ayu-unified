@@ -2465,9 +2465,6 @@ address, caption, cite, code, dfn, em, var {
     display: block
   }
 
-  .layer_on .area_menu .area_search {
-    display: block
-  }
 
   .layer_on .area_menu .frm_search {
     display: block
@@ -3708,7 +3705,7 @@ html[data-theme] .article_skin {
 
 /* 다크에서만 폰트 강제(라이트는 원본 유지 원칙) */
 html[data-theme="dark"] .wrap_skin,
-html[data-theme="dark"] .wrap_skin * {
+html[data-theme="dark"] body {
   font-family: var(--font-body);
 }
 
