@@ -3874,11 +3874,13 @@ html[data-theme] .article-view .ayu-code-wrap {
 html[data-theme] .article-view .code-meta {
   position: absolute;
   top: 10px;
+  left: 10px;
   right: 10px;
   z-index: 2;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 html[data-theme] .article-view .code-lang {
@@ -3892,6 +3894,7 @@ html[data-theme] .article-view .code-lang {
   border-radius: var(--radius-sm);
   background: transparent;
   letter-spacing: 0.01em;
+  text-align: left;
 }
 
 html[data-theme] .article-view pre.has-code-copy {
@@ -3975,6 +3978,12 @@ html[data-theme="light"] .article-view .btn_code_copy.is-failed {
 }
 
 @media (max-width: 560px) {
+  html[data-theme] .article-view .code-meta {
+    left: auto;
+    right: 10px;
+    justify-content: flex-end;
+  }
+
   html[data-theme] .article-view .code-lang {
     display: none;
   }
