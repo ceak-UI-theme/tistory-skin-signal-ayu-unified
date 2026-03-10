@@ -33,8 +33,7 @@
   - Kept code font override rules unchanged.
 
 ## Asset review
-- `images/font.css` is currently not referenced by `skin.html` or `style.css`.
-- It is intentionally kept as a legacy-compatible asset in the package to avoid unexpected downstream assumptions in existing zip consumers.
+- `images/font.css` was not referenced by `skin.html` or `style.css` and was removed in `v2.0.3`.
 
 ## Intentionally not changed
 - No Tistory placeholder renaming/removal.
