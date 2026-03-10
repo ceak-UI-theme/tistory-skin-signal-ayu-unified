@@ -3712,41 +3712,41 @@ html[data-theme] .article_skin {
   color: var(--text) !important;
 }
 
-/* 다크에서만 폰트 강제(라이트는 원본 유지 원칙) */
-html[data-theme="dark"] .wrap_skin,
-html[data-theme="dark"] body {
+/* 라이트/다크 공통 폰트 강제 */
+html[data-theme] .wrap_skin,
+html[data-theme] body {
   font-family: var(--font-body);
 }
 
-/* 본문 타이포(다크): 전역 * 강제를 피하고 주요 콘텐츠 태그에 한정 */
-html[data-theme="dark"] .article-view,
-html[data-theme="dark"] .article-view p,
-html[data-theme="dark"] .article-view li,
-html[data-theme="dark"] .article-view dt,
-html[data-theme="dark"] .article-view dd,
-html[data-theme="dark"] .article-view blockquote,
-html[data-theme="dark"] .article-view figcaption,
-html[data-theme="dark"] .article-view table,
-html[data-theme="dark"] .article-view th,
-html[data-theme="dark"] .article-view td,
-html[data-theme="dark"] .article-view h1,
-html[data-theme="dark"] .article-view h2,
-html[data-theme="dark"] .article-view h3,
-html[data-theme="dark"] .article-view h4,
-html[data-theme="dark"] .article-view h5,
-html[data-theme="dark"] .article-view h6 {
+/* 본문 타이포: 전역 * 강제를 피하고 주요 콘텐츠 태그에 한정 */
+html[data-theme] .article-view,
+html[data-theme] .article-view p,
+html[data-theme] .article-view li,
+html[data-theme] .article-view dt,
+html[data-theme] .article-view dd,
+html[data-theme] .article-view blockquote,
+html[data-theme] .article-view figcaption,
+html[data-theme] .article-view table,
+html[data-theme] .article-view th,
+html[data-theme] .article-view td,
+html[data-theme] .article-view h1,
+html[data-theme] .article-view h2,
+html[data-theme] .article-view h3,
+html[data-theme] .article-view h4,
+html[data-theme] .article-view h5,
+html[data-theme] .article-view h6 {
   font-family: var(--font-body) !important;
 }
 
-/* 코드 폰트(다크 only: 원본 충돌 방지) */
-html[data-theme="dark"] .article-view pre,
-html[data-theme="dark"] .article-view code,
-html[data-theme="dark"] .article-view pre code,
-html[data-theme="dark"] .article-view pre code.hljs,
-html[data-theme="dark"] pre,
-html[data-theme="dark"] code,
-html[data-theme="dark"] kbd,
-html[data-theme="dark"] samp {
+/* 코드 폰트: 라이트/다크 공통 */
+html[data-theme] .article-view pre,
+html[data-theme] .article-view code,
+html[data-theme] .article-view pre code,
+html[data-theme] .article-view pre code.hljs,
+html[data-theme] pre,
+html[data-theme] code,
+html[data-theme] kbd,
+html[data-theme] samp {
   font-family: var(--font-mono) !important;
 }
 
@@ -4517,12 +4517,12 @@ html[data-theme] .article-view hr[data-ke-style='style5'],
 html[data-theme] .article-view hr[data-ke-style='style6'] {
   width: 100%;
   height: 2px;
-  padding: 20px 0;
+  padding: 8px 0;
 }
 
 html[data-theme] .article-view hr[data-ke-style='style5']::before,
 html[data-theme] .article-view hr[data-ke-style='style6']::before {
-  top: 20px;
+  top: 8px;
   width: 100%;
   border-top: 1px solid var(--border);
 }
@@ -4539,18 +4539,18 @@ html[data-theme] .article-view hr[data-ke-style='style7'],
 html[data-theme] .article-view hr[data-ke-style='style8'] {
   width: 200px;
   height: 12px;
-  padding: 18px 0;
+  padding: 12px 0;
 }
 
 html[data-theme] .article-view hr[data-ke-style='style7']::before,
 html[data-theme] .article-view hr[data-ke-style='style8']::before {
-  top: 24px;
+  top: 18px;
   width: 200px;
   border-top: 1px solid var(--border);
 }
 
 html[data-theme] .article-view hr[data-ke-style='style7']::after {
-  top: 18px;
+  top: 12px;
   width: 12px;
   height: 12px;
   border: 1px solid var(--text-muted);
@@ -4559,12 +4559,19 @@ html[data-theme] .article-view hr[data-ke-style='style7']::after {
 }
 
 html[data-theme] .article-view hr[data-ke-style='style8']::after {
-  top: 20px;
+  top: 14px;
   width: 8px;
   height: 8px;
   border: 1px solid var(--text-muted);
   background: var(--bg);
   border-radius: 999px;
+}
+
+/* Tighten spacing only when a heading follows a KE divider */
+.article-view hr[data-ke-style] + h2,
+.article-view hr[data-ke-style] + h3,
+.article-view hr[data-ke-style] + h4 {
+  margin-top: 0.35em;
 }
 
 
