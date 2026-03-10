@@ -705,12 +705,96 @@ w.SignalAyuTheme = {
 		}
 	})();
 
+	Area.ReadingProgress = (function() {
+		var barWrap;
+		var barFill;
+		var article;
+		var ticking = false;
+		var minScrollableRange = 280;
+
+		var clamp = function(value, min, max) {
+			return Math.max(min, Math.min(max, value));
+		};
+
+		var hide = function() {
+			if (barWrap) {
+				barWrap.classList.remove("is-active");
+			}
+			if (barFill) {
+				barFill.style.width = "0%";
+			}
+		};
+
+		var update = function() {
+			ticking = false;
+			if (!barWrap || !barFill || !article) {
+				hide();
+				return;
+			}
+
+			var rect = article.getBoundingClientRect();
+			var viewportH = w.innerHeight || w.document.documentElement.clientHeight || 0;
+			var articleTop = rect.top + w.pageYOffset;
+			var articleHeight = Math.max(0, rect.height);
+			var articleEnd = articleTop + articleHeight;
+			var range = articleEnd - articleTop - viewportH;
+
+			// Very short posts: keep hidden.
+			if (range < minScrollableRange) {
+				hide();
+				return;
+			}
+
+			var y = w.pageYOffset || w.document.documentElement.scrollTop || 0;
+			var raw = (y - articleTop) / range;
+			var progress = clamp(raw, 0, 1);
+
+			// Hide until reader meaningfully reaches article body.
+			if (progress <= 0) {
+				hide();
+				return;
+			}
+
+			barWrap.classList.add("is-active");
+			barFill.style.width = (progress * 100).toFixed(2) + "%";
+		};
+
+		var requestUpdate = function() {
+			if (ticking) {
+				return;
+			}
+			ticking = true;
+			w.requestAnimationFrame(update);
+		};
+
+		var init = function() {
+			barWrap = w.document.querySelector(".reading_progress");
+			barFill = w.document.querySelector(".reading_progress_bar");
+			article = w.document.querySelector(".skin_view .area_view.article-view");
+			if (!barWrap || !barFill || !article) {
+				return;
+			}
+
+			if (!barWrap.__signalAyuReadingProgressBound) {
+				w.addEventListener("scroll", requestUpdate, { passive: true });
+				w.addEventListener("resize", requestUpdate);
+				barWrap.__signalAyuReadingProgressBound = true;
+			}
+			requestUpdate();
+		};
+
+		return {
+			init: init
+		};
+	})();
+
 	Area.init = function() {
 		Area.Skin.init();
 		Area.Profile.init();
 		Area.Category.init();
 		Area.Search.init();
 		Area.Comment.init();
+		Area.ReadingProgress.init();
 		if (w.SignalAyuCodeCopy && typeof w.SignalAyuCodeCopy.init === "function" && w.document.querySelector(".article-view")) {
 			w.SignalAyuCodeCopy.init();
 		}
