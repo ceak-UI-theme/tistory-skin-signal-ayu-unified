@@ -492,11 +492,32 @@
     </div>
   </s_t3>
 
-  <script src="./images/script.js?v=2.0.3"></script>
+  <!-- TOC (floating desktop + mobile panel) -->
+  <aside id="tocFloating" class="toc-floating" hidden>
+    <strong class="toc-title">Contents</strong>
+    <nav id="tocNavDesktop" class="toc-nav" aria-label="본문 목차"></nav>
+  </aside>
+
+  <button id="tocMobileBtn" class="toc-mobile-btn" type="button" aria-label="목차 열기" aria-expanded="false" hidden>
+    Contents
+  </button>
+  <div id="tocMobileBackdrop" class="toc-mobile-backdrop" hidden></div>
+  <section id="tocMobilePanel" class="toc-mobile-panel" aria-label="모바일 목차" hidden>
+    <div class="toc-mobile-head">
+      <strong class="toc-title">Contents</strong>
+      <button id="tocMobileClose" class="toc-mobile-close" type="button" aria-label="목차 닫기">닫기</button>
+    </div>
+    <nav id="tocNavMobile" class="toc-nav" aria-label="본문 목차"></nav>
+  </section>
+
+  <script src="./images/script.js?v=2.0.6"></script>
   <script>
     (function (w, $) {
       if (w.SignalAyuTheme && typeof w.SignalAyuTheme.init === 'function') {
         w.SignalAyuTheme.init();
+      }
+      if (w.SignalAyuToc && typeof w.SignalAyuToc.init === 'function') {
+        w.SignalAyuToc.init();
       }
       if ($ && $.Area && typeof $.Area.init === 'function') {
         $.Area.init();
