@@ -832,6 +832,100 @@ w.SignalAyuTheme = {
 		}
 	})();
 
+	Area.ReadingTime = (function() {
+		var getSkinView = function() {
+			return w.document.querySelector(".skin_view");
+		};
+
+		var isPostDetailView = function(skinView) {
+			if (!skinView) {
+				return false;
+			}
+			// In this skin, post permalink has category link href.
+			// Notice/protected/page templates either miss href or article-view body.
+			var categoryLink = skinView.querySelector(".area_title .tit_category a[href]");
+			var articleView = skinView.querySelector(".area_view.article-view");
+			return !!(categoryLink && articleView);
+		};
+
+		var getArticleTextContainer = function(skinView) {
+			if (!skinView) {
+				return null;
+			}
+			return skinView.querySelector(".area_view.article-view .tt_article_useless_p_margin")
+				|| skinView.querySelector(".area_view.article-view");
+		};
+
+		var getMetaLine = function(skinView) {
+			if (!skinView) {
+				return null;
+			}
+			return skinView.querySelector(".area_title .txt_detail.my_post");
+		};
+
+		var estimateMinutes = function(text) {
+			var normalized = (text || "").replace(/\s+/g, "");
+			var chars = normalized.length;
+			if (!chars) {
+				return 0;
+			}
+			var minutes = Math.ceil(chars / 500);
+			return minutes < 1 ? 1 : minutes;
+		};
+
+		var init = function() {
+			var skinView = getSkinView();
+			var articleTextContainer;
+			var metaLine;
+			var existing;
+			var minutes;
+			var text;
+			var node;
+			var editMenu;
+
+			if (!isPostDetailView(skinView)) {
+				return;
+			}
+
+			articleTextContainer = getArticleTextContainer(skinView);
+			metaLine = getMetaLine(skinView);
+			if (!articleTextContainer || !metaLine) {
+				return;
+			}
+
+			existing = metaLine.querySelector(".reading_time");
+			editMenu = metaLine.querySelector(".my_edit");
+
+			text = articleTextContainer.textContent || "";
+			minutes = estimateMinutes(text);
+			if (minutes < 2) {
+				return;
+			}
+
+			if (!existing) {
+				node = w.document.createElement("span");
+				node.className = "reading_time";
+				node.textContent = " \u00b7 " + minutes + " min read";
+				if (editMenu) {
+					metaLine.insertBefore(node, editMenu);
+				} else {
+					metaLine.appendChild(node);
+				}
+				existing = node;
+			}
+
+			// Deterministically normalize final order:
+			// author/date text -> .reading_time -> .my_edit
+			if (existing && editMenu && (existing.compareDocumentPosition(editMenu) & Node.DOCUMENT_POSITION_PRECEDING)) {
+				metaLine.insertBefore(existing, editMenu);
+			}
+		};
+
+		return {
+			init: init
+		};
+	})();
+
 	Area.ReadingProgress = (function() {
 		var barWrap;
 		var barFill;
@@ -921,6 +1015,7 @@ w.SignalAyuTheme = {
 		Area.Category.init();
 		Area.Search.init();
 		Area.Comment.init();
+		Area.ReadingTime.init();
 		Area.ReadingProgress.init();
 		if (w.SignalAyuCodeCopy && typeof w.SignalAyuCodeCopy.init === "function" && w.document.querySelector(".article-view")) {
 			w.SignalAyuCodeCopy.init();

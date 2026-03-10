@@ -3570,7 +3570,7 @@ hr[data-ke-style='style8'],
    - Typography and code block optimization
    - Mobile refinement
 
-   Version: v2.0
+   Version: v2.1.0
    Maintainer: ceak
    Website: https://ceak.tistory.com
 
@@ -3794,6 +3794,17 @@ html[data-theme] .skin_view .tit_category a {
 html[data-theme] .skin_view .txt_detail,
 html[data-theme] .skin_view .link_detail {
   color: var(--text-muted) !important;
+}
+
+html[data-theme] .skin_view .txt_detail .reading_time {
+  color: inherit;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+html[data-theme] .skin_view .area_title .txt_detail.my_post .my_edit {
+  float: none !important;
+  margin-left: 8px;
 }
 
 /* =========================================================
