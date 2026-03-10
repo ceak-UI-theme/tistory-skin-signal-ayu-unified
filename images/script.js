@@ -371,6 +371,227 @@ w.SignalAyuTheme = {
 	};
 })(window);
 
+;(function(w) {
+	var DEFAULT_LABEL = "Copy";
+	var COPIED_LABEL = "Copied";
+	var FAILED_LABEL = "Failed";
+
+	var setButtonState = function(btn, label) {
+		if (!btn) return;
+		btn.textContent = label;
+		btn.setAttribute("aria-label", "Copy code to clipboard");
+	};
+
+	var resetButtonStateLater = function(btn) {
+		if (!btn) return;
+		w.setTimeout(function() {
+			setButtonState(btn, DEFAULT_LABEL);
+		}, 1400);
+	};
+
+	var fallbackCopy = function(text) {
+		var ta = w.document.createElement("textarea");
+		ta.value = text;
+		ta.setAttribute("readonly", "");
+		ta.style.position = "fixed";
+		ta.style.top = "-1000px";
+		ta.style.left = "-1000px";
+		w.document.body.appendChild(ta);
+		ta.select();
+		var ok = false;
+		try {
+			ok = w.document.execCommand("copy");
+		} catch (e) {
+			ok = false;
+		}
+		w.document.body.removeChild(ta);
+		return ok;
+	};
+
+	var copyText = function(text) {
+		if (w.navigator.clipboard && typeof w.navigator.clipboard.writeText === "function") {
+			return w.navigator.clipboard.writeText(text);
+		}
+		return new Promise(function(resolve, reject) {
+			if (fallbackCopy(text)) resolve();
+			else reject(new Error("fallback copy failed"));
+		});
+	};
+
+	var getCodeText = function(pre) {
+		var code = pre.querySelector("code");
+		return (code ? code.textContent : pre.textContent) || "";
+	};
+
+	var detectRawLanguage = function(pre) {
+		if (!pre) return "";
+		var fromKe = (pre.getAttribute("data-ke-language") || "").trim().toLowerCase();
+		if (fromKe) {
+			return fromKe;
+		}
+
+		var code = pre.querySelector("code");
+		if (!code) {
+			return "";
+		}
+
+		var className = code.className || "";
+		var m = className.match(/\blanguage-([a-z0-9_+-]+)\b/i);
+		if (m && m[1]) {
+			return m[1].toLowerCase();
+		}
+		m = className.match(/\blang-([a-z0-9_+-]+)\b/i);
+		if (m && m[1]) {
+			return m[1].toLowerCase();
+		}
+		return "";
+	};
+
+	var normalizeLanguageLabel = function(raw) {
+		if (!raw) return "";
+		var key = raw.toLowerCase();
+		var map = {
+			javascript: "JavaScript",
+			js: "JS",
+			css: "CSS",
+			html: "HTML",
+			bash: "Bash",
+			shell: "Shell",
+			json: "JSON",
+			yaml: "YAML",
+			yml: "YAML"
+		};
+		return map[key] || "";
+	};
+
+	var enhancePre = function(pre) {
+		if (!pre || pre.__signalAyuCopyBound || pre.classList.contains("has-code-copy")) {
+			return;
+		}
+
+		var text = getCodeText(pre);
+		if (!text || !text.trim()) {
+			return;
+		}
+
+		var parent = pre.parentNode;
+		if (!parent) {
+			return;
+		}
+		if (parent.classList && parent.classList.contains("ayu-code-wrap")) {
+			return;
+		}
+
+		var wrapper = w.document.createElement("div");
+		wrapper.className = "ayu-code-wrap";
+
+		parent.insertBefore(wrapper, pre);
+		wrapper.appendChild(pre);
+
+		var meta = w.document.createElement("div");
+		meta.className = "code-meta";
+		wrapper.insertBefore(meta, pre);
+
+		var label = normalizeLanguageLabel(detectRawLanguage(pre));
+		if (label && !meta.querySelector(".code-lang")) {
+			var lang = w.document.createElement("span");
+			lang.className = "code-lang";
+			lang.textContent = label;
+			meta.appendChild(lang);
+		}
+
+		var btn = w.document.createElement("button");
+		btn.type = "button";
+		btn.className = "btn_code_copy";
+		btn.setAttribute("aria-label", "Copy code to clipboard");
+		setButtonState(btn, DEFAULT_LABEL);
+		meta.appendChild(btn);
+
+		pre.classList.add("has-code-copy");
+
+		btn.addEventListener("click", function() {
+			copyText(getCodeText(pre)).then(function() {
+				setButtonState(btn, COPIED_LABEL);
+				resetButtonStateLater(btn);
+			}).catch(function() {
+				setButtonState(btn, FAILED_LABEL);
+				resetButtonStateLater(btn);
+			});
+		});
+
+		pre.__signalAyuCopyBound = true;
+	};
+
+	var init = function() {
+		var article = w.document.querySelector(".article-view");
+		if (!article) {
+			return;
+		}
+		var blocks = article.querySelectorAll("pre");
+		var i;
+		for (i = 0; i < blocks.length; i++) {
+			enhancePre(blocks[i]);
+		}
+	};
+
+	var observeArticle = function() {
+		var article = w.document.querySelector(".article-view");
+		if (!article || article.__signalAyuCopyObserved) {
+			return;
+		}
+
+		var observer = new MutationObserver(function(mutations) {
+			var i;
+			for (i = 0; i < mutations.length; i++) {
+				var m = mutations[i];
+				if (!m.addedNodes || !m.addedNodes.length) {
+					continue;
+				}
+				var j;
+				for (j = 0; j < m.addedNodes.length; j++) {
+					var node = m.addedNodes[j];
+					if (!node || node.nodeType !== 1) {
+						continue;
+					}
+					if (node.tagName === "PRE") {
+						enhancePre(node);
+						continue;
+					}
+					if (node.querySelectorAll) {
+						var pres = node.querySelectorAll("pre");
+						var k;
+						for (k = 0; k < pres.length; k++) {
+							enhancePre(pres[k]);
+						}
+					}
+				}
+			}
+		});
+
+		observer.observe(article, { childList: true, subtree: true });
+		article.__signalAyuCopyObserved = true;
+		article.__signalAyuCopyObserver = observer;
+	};
+
+	var boot = function() {
+		init();
+		observeArticle();
+		// Tistory/hljs post-processing safety pass
+		w.setTimeout(init, 300);
+		w.setTimeout(init, 1000);
+	};
+
+	w.SignalAyuCodeCopy = {
+		init: init
+	};
+
+	if (w.document.readyState === "loading") {
+		w.document.addEventListener("DOMContentLoaded", boot);
+	} else {
+		boot();
+	}
+})(window);
+
 ;(function(w, $) {
 	if (!$) {
 		return;
@@ -484,6 +705,9 @@ w.SignalAyuTheme = {
 		Area.Category.init();
 		Area.Search.init();
 		Area.Comment.init();
+		if (w.SignalAyuCodeCopy && typeof w.SignalAyuCodeCopy.init === "function" && w.document.querySelector(".article-view")) {
+			w.SignalAyuCodeCopy.init();
+		}
 	};
 
 	$.Area = Area;
