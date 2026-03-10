@@ -34,6 +34,9 @@ FILES=(
   "images"
 )
 
+# Packaging policy: keep personal workspace variants out of release zip.
+# "my/" is intentionally excluded.
+
 for f in "${FILES[@]}"; do
   if [[ ! -e "${f}" ]]; then
     echo "Error: Missing required file or directory: ${f}" >&2
@@ -44,9 +47,9 @@ done
 mkdir -p "${OUTPUT_DIR}"
 
 if command -v zip >/dev/null 2>&1; then
-  zip -r -q "${OUTPUT_PATH}" "${FILES[@]}"
+  zip -r -q "${OUTPUT_PATH}" "${FILES[@]}" -x "my/*"
 elif command -v 7z >/dev/null 2>&1; then
-  7z a -tzip -mx=9 -bd -y "${OUTPUT_PATH}" "${FILES[@]}" >/dev/null
+  7z a -tzip -mx=9 -bd -y "${OUTPUT_PATH}" "${FILES[@]}" -x!my/* >/dev/null
 elif command -v python3 >/dev/null 2>&1; then
   python3 - "${OUTPUT_PATH}" "${FILES[@]}" <<'PY'
 import os
