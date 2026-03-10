@@ -79,7 +79,7 @@
 
       <div id="dkGnb" class="area_menu">
         <!-- ⭐ 다크모드 토글 버튼 -->
-        <button type="button" class="btn_theme" aria-label="다크모드 토글">
+        <button type="button" class="btn_theme" aria-label="테마 전환" aria-pressed="false">
           🌙
         </button>
         <s_search>
@@ -493,48 +493,14 @@
 
   <script src="./images/script.js"></script>
   <script>
-    (function ($) {
-      $.Area.init();
-    })(jQuery);
-  </script>
-  <!-- ⭐ 테마 토글 스크립트 -->
-  <script>
-  (function () {
-    var KEY = 'theme';
-    var DEFAULT_THEME = 'dark';
-    var root = document.documentElement;
-    var btn = document.querySelector('.btn_theme');
-
-    function syncButton(theme) {
-      if (!btn) {
-        return;
+    (function (w, $) {
+      if (w.SignalAyuTheme && typeof w.SignalAyuTheme.init === 'function') {
+        w.SignalAyuTheme.init();
       }
-
-      btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-      btn.setAttribute('aria-label', theme === 'dark' ? '라이트모드로 전환' : '다크모드로 전환');
-    }
-
-    function apply(theme) {
-      root.setAttribute('data-theme', theme);
-      try {
-        localStorage.setItem(KEY, theme);
-      } catch (e) {}
-      syncButton(theme);
-    }
-
-    function current() {
-      var theme = root.getAttribute('data-theme');
-      return theme === 'light' || theme === 'dark' ? theme : DEFAULT_THEME;
-    }
-
-    apply(current());
-
-    if (btn) {
-      btn.addEventListener('click', function () {
-        apply(current() === 'dark' ? 'light' : 'dark');
-      });
-    }
-  })();
+      if ($ && $.Area && typeof $.Area.init === 'function') {
+        $.Area.init();
+      }
+    })(window, window.jQuery);
   </script>
 </body>
 

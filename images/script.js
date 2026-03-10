@@ -1,4 +1,56 @@
-;(function($) {
+;(function(w) {
+	var KEY = "theme",
+		DEFAULT_THEME = "dark",
+		root = w.document.documentElement;
+
+	var getCurrentTheme = function() {
+		var theme = root.getAttribute("data-theme");
+		return theme === "light" || theme === "dark" ? theme : DEFAULT_THEME;
+	};
+
+	var syncButton = function(theme) {
+		var btn = w.document.querySelector(".btn_theme");
+		if (!btn) {
+			return;
+		}
+		var isDark = theme === "dark";
+		btn.textContent = isDark ? "☀️" : "🌙";
+		btn.setAttribute("aria-label", isDark ? "라이트모드로 전환" : "다크모드로 전환");
+		btn.setAttribute("aria-pressed", isDark ? "true" : "false");
+	};
+
+	var applyTheme = function(theme) {
+		root.setAttribute("data-theme", theme);
+		try {
+			w.localStorage.setItem(KEY, theme);
+		} catch (e) {}
+		syncButton(theme);
+	};
+
+	var toggleTheme = function() {
+		applyTheme(getCurrentTheme() === "dark" ? "light" : "dark");
+	};
+
+	var initTheme = function() {
+		var btn = w.document.querySelector(".btn_theme");
+		applyTheme(getCurrentTheme());
+		if (btn && !btn.__signalAyuThemeBound) {
+			btn.addEventListener("click", toggleTheme);
+			btn.__signalAyuThemeBound = true;
+		}
+	};
+
+	w.SignalAyuTheme = {
+		init: initTheme,
+		apply: applyTheme,
+		current: getCurrentTheme
+	};
+})(window);
+
+;(function(w, $) {
+	if (!$) {
+		return;
+	}
 
 	var Area = {};
 
@@ -111,4 +163,4 @@
 	};
 
 	$.Area = Area;
-})(jQuery);
+})(window, window.jQuery);
