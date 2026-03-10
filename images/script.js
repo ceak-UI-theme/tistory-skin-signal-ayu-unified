@@ -51,7 +51,8 @@ w.SignalAyuTheme = {
 	var state = {
 		entries: [],
 		headerOffset: 92,
-		mobileOpen: false
+		mobileOpen: false,
+		initialized: false
 	};
 
 	var byId = function(id) {
@@ -60,18 +61,28 @@ w.SignalAyuTheme = {
 
 	var isPermalinkContext = function() {
 		var body = w.document.body;
+		var skinView;
+		var bodyId;
+		var listLikeTokens;
+		var i;
+		var categoryLink;
+		var articleViews;
+		var titleNode;
 		if (!body) {
 			return false;
 		}
 
-		// Tistory detail page guard: list/home pages usually keep this as null.
 		if (!w.T || !w.T.entryInfo) {
 			return false;
 		}
 
-		var bodyId = (body.id || "").toLowerCase();
-		var listLikeTokens = ["index", "category", "tag", "search", "archive", "guestbook"];
-		var i;
+		skinView = w.document.querySelector(".skin_view");
+		if (!skinView) {
+			return false;
+		}
+
+		bodyId = (body.id || "").toLowerCase();
+		listLikeTokens = ["index", "category", "tag", "search", "archive", "guestbook"];
 
 		for (i = 0; i < listLikeTokens.length; i++) {
 			if (bodyId.indexOf(listLikeTokens[i]) >= 0) {
@@ -79,25 +90,31 @@ w.SignalAyuTheme = {
 			}
 		}
 
-		var detailLike = bodyId.indexOf("entry") >= 0 || bodyId.indexOf("page") >= 0 || bodyId.indexOf("notice") >= 0;
-		if (!detailLike) {
+		// This skin's true post permalink includes a category link with href.
+		categoryLink = skinView.querySelector(".area_title .tit_category a[href]");
+		if (!categoryLink) {
 			return false;
 		}
 
-		var skins = w.document.querySelectorAll(".skin_view .area_view.article-view");
-		if (skins.length !== 1) {
+		articleViews = skinView.querySelectorAll(".area_view.article-view");
+		if (articleViews.length !== 1) {
 			return false;
 		}
 
-		var titleLink = w.document.querySelector(".skin_view .area_title .tit_post a");
-		return !!titleLink;
+		titleNode = skinView.querySelector(".area_title .tit_post");
+		return !!titleNode;
 	};
 
 	var getArticleContainer = function() {
+		var articleView;
 		if (!isPermalinkContext()) {
 			return null;
 		}
-		return w.document.querySelector(".skin_view .area_view.article-view");
+		articleView = w.document.querySelector(".skin_view .area_view.article-view");
+		if (!articleView) {
+			return null;
+		}
+		return articleView.querySelector(".tt_article_useless_p_margin") || articleView;
 	};
 
 	var slugify = function(text) {
@@ -127,19 +144,37 @@ w.SignalAyuTheme = {
 		return candidate;
 	};
 
+	var pickHeadingMode = function(container) {
+		if (container.querySelector("h1")) {
+			return { topTag: "H1", childTag: "H2" };
+		}
+		if (container.querySelector("h2")) {
+			return { topTag: "H2", childTag: "H3" };
+		}
+		if (container.querySelector("h3")) {
+			return { topTag: "H3", childTag: "H4" };
+		}
+		return null;
+	};
+
 	var buildEntries = function(container) {
-		var hasH1 = !!container.querySelector("h1");
-		var topTag = hasH1 ? "H1" : "H2";
-		var childTag = hasH1 ? "H2" : "H3";
+		var mode = pickHeadingMode(container);
 		var usedIds = {};
 		var raw = [];
-		var nodes = container.querySelectorAll("h1, h2, h3");
+		var nodes;
 		var i;
+		var flat;
+
+		if (!mode) {
+			return [];
+		}
+
+		nodes = container.querySelectorAll(mode.topTag.toLowerCase() + ", " + mode.childTag.toLowerCase());
 
 		for (i = 0; i < nodes.length; i++) {
 			var el = nodes[i];
 			var tag = el.tagName;
-			if (tag !== topTag && tag !== childTag) {
+			if (tag !== mode.topTag && tag !== mode.childTag) {
 				continue;
 			}
 			var text = (el.textContent || "").trim();
@@ -162,7 +197,7 @@ w.SignalAyuTheme = {
 		var currentTop = null;
 		for (i = 0; i < raw.length; i++) {
 			var item = raw[i];
-			if (item.tag === topTag) {
+			if (item.tag === mode.topTag) {
 				currentTop = {
 					id: item.id,
 					text: item.text,
@@ -184,7 +219,7 @@ w.SignalAyuTheme = {
 			});
 		}
 
-		var flat = [];
+		flat = [];
 		for (i = 0; i < nested.length; i++) {
 			flat.push(nested[i]);
 			var j;
@@ -196,18 +231,31 @@ w.SignalAyuTheme = {
 		return flat.length >= 2 ? nested : [];
 	};
 
+	var escapeHtml = function(text) {
+		return (text || "")
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	};
+
+	var escapeAttr = function(text) {
+		return escapeHtml(text);
+	};
+
 	var renderList = function(tree) {
 		var html = ['<ul class="toc-list">'];
 		var i;
 		for (i = 0; i < tree.length; i++) {
 			var top = tree[i];
-			html.push('<li class="toc-item toc-item-l1"><a class="toc-link toc-link-l1" href="#' + top.id + '" data-target="' + top.id + '">' + top.text + "</a>");
+			html.push('<li class="toc-item toc-item-l1"><a class="toc-link toc-link-l1" href="#' + escapeAttr(top.id) + '" data-target="' + escapeAttr(top.id) + '">' + escapeHtml(top.text) + "</a>");
 			if (top.children && top.children.length) {
 				html.push('<ul class="toc-sublist">');
 				var j;
 				for (j = 0; j < top.children.length; j++) {
 					var child = top.children[j];
-					html.push('<li class="toc-item toc-item-l2"><a class="toc-link toc-link-l2" href="#' + child.id + '" data-target="' + child.id + '">' + child.text + "</a></li>");
+					html.push('<li class="toc-item toc-item-l2"><a class="toc-link toc-link-l2" href="#' + escapeAttr(child.id) + '" data-target="' + escapeAttr(child.id) + '">' + escapeHtml(child.text) + "</a></li>");
 				}
 				html.push("</ul>");
 			}
@@ -298,6 +346,9 @@ w.SignalAyuTheme = {
 	};
 
 	var bindEvents = function() {
+		if (state.initialized) {
+			return;
+		}
 		var clickHandler = function(e) {
 			var link = e.target.closest(".toc-link");
 			if (!link) return;
@@ -333,6 +384,7 @@ w.SignalAyuTheme = {
 				closeMobile();
 			}
 		});
+		state.initialized = true;
 	};
 
 	var init = function() {
