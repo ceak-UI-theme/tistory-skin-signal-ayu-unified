@@ -376,16 +376,22 @@ w.SignalAyuTheme = {
 	var COPIED_LABEL = "Copied";
 	var FAILED_LABEL = "Failed";
 
-	var setButtonState = function(btn, label) {
+	var setButtonState = function(btn, label, state) {
 		if (!btn) return;
 		btn.textContent = label;
 		btn.setAttribute("aria-label", "Copy code to clipboard");
+		btn.classList.remove("is-copied", "is-failed");
+		if (state === "copied") {
+			btn.classList.add("is-copied");
+		} else if (state === "failed") {
+			btn.classList.add("is-failed");
+		}
 	};
 
 	var resetButtonStateLater = function(btn) {
 		if (!btn) return;
 		w.setTimeout(function() {
-			setButtonState(btn, DEFAULT_LABEL);
+			setButtonState(btn, DEFAULT_LABEL, "default");
 		}, 1400);
 	};
 
@@ -504,20 +510,20 @@ w.SignalAyuTheme = {
 		btn.type = "button";
 		btn.className = "btn_code_copy";
 		btn.setAttribute("aria-label", "Copy code to clipboard");
-		setButtonState(btn, DEFAULT_LABEL);
+		setButtonState(btn, DEFAULT_LABEL, "default");
 		meta.appendChild(btn);
 
 		pre.classList.add("has-code-copy");
 
-		btn.addEventListener("click", function() {
-			copyText(getCodeText(pre)).then(function() {
-				setButtonState(btn, COPIED_LABEL);
-				resetButtonStateLater(btn);
-			}).catch(function() {
-				setButtonState(btn, FAILED_LABEL);
-				resetButtonStateLater(btn);
+			btn.addEventListener("click", function() {
+				copyText(getCodeText(pre)).then(function() {
+					setButtonState(btn, COPIED_LABEL, "copied");
+					resetButtonStateLater(btn);
+				}).catch(function() {
+					setButtonState(btn, FAILED_LABEL, "failed");
+					resetButtonStateLater(btn);
+				});
 			});
-		});
 
 		pre.__signalAyuCopyBound = true;
 	};
