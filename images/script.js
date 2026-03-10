@@ -372,6 +372,133 @@ w.SignalAyuTheme = {
 })(window);
 
 ;(function(w) {
+	var getArticleContainer = function() {
+		return w.document.querySelector(".skin_view .area_view.article-view .tt_article_useless_p_margin")
+			|| w.document.querySelector(".skin_view .area_view.article-view");
+	};
+
+	var slugify = function(text) {
+		return (text || "")
+			.toLowerCase()
+			.trim()
+			.replace(/[\s_./+|]+/g, "-")
+			.replace(/[^a-z0-9가-힣-]/g, "")
+			.replace(/-+/g, "-")
+			.replace(/^-+|-+$/g, "") || "section";
+	};
+
+	var buildIdCountMap = function(scope) {
+		var counts = {};
+		if (!scope) return counts;
+		var nodes = scope.querySelectorAll("[id]");
+		var i;
+		for (i = 0; i < nodes.length; i++) {
+			var id = nodes[i].id;
+			if (!id) continue;
+			counts[id] = (counts[id] || 0) + 1;
+		}
+		return counts;
+	};
+
+	var getHeadingText = function(h2) {
+		var clone = h2.cloneNode(true);
+		var anchors = clone.querySelectorAll(".heading-anchor");
+		var i;
+		for (i = 0; i < anchors.length; i++) {
+			anchors[i].remove();
+		}
+		return (clone.textContent || "").trim();
+	};
+
+	var ensureId = function(h2, idCounts, assignedIds) {
+		var existingId = (h2.id || "").trim();
+		if (existingId && idCounts[existingId] === 1 && !assignedIds[existingId]) {
+			assignedIds[existingId] = true;
+			return existingId;
+		}
+
+		var base = slugify(getHeadingText(h2));
+		var candidate = base;
+		var n = 2;
+		while (assignedIds[candidate] || idCounts[candidate]) {
+			candidate = base + "-" + n;
+			n++;
+		}
+
+		h2.id = candidate;
+		assignedIds[candidate] = true;
+		idCounts[candidate] = 1;
+		return candidate;
+	};
+
+	var scrollToHeading = function(id, behavior) {
+		var target = w.document.getElementById(id);
+		if (!target) return;
+		var head = w.document.querySelector(".area_head");
+		var offset = (head ? head.offsetHeight : 0) + 12;
+		var top = target.getBoundingClientRect().top + w.pageYOffset - offset;
+		w.scrollTo({ top: top, behavior: behavior || "smooth" });
+	};
+
+	var onAnchorClick = function(e) {
+		var link = e.target.closest(".heading-anchor");
+		if (!link) return;
+		var href = link.getAttribute("href") || "";
+		if (href.charAt(0) !== "#") return;
+		var id = href.slice(1);
+		if (!id) return;
+
+		e.preventDefault();
+		scrollToHeading(id, "smooth");
+		if (w.history && typeof w.history.replaceState === "function") {
+			w.history.replaceState(null, "", "#" + id);
+		} else {
+			w.location.hash = id;
+		}
+	};
+
+	var init = function() {
+		var container = getArticleContainer();
+		if (!container) return;
+
+		var headings = container.querySelectorAll("h2");
+		if (!headings.length) return;
+
+		var idCounts = buildIdCountMap(container);
+		var assignedIds = {};
+		var i;
+		for (i = 0; i < headings.length; i++) {
+			var h2 = headings[i];
+			var id = ensureId(h2, idCounts, assignedIds);
+			if (!id) continue;
+			if (h2.querySelector(".heading-anchor")) continue;
+
+			var a = w.document.createElement("a");
+			a.className = "heading-anchor";
+			a.href = "#" + id;
+			a.setAttribute("aria-label", "Link to this section");
+			a.textContent = "#";
+			h2.appendChild(a);
+		}
+
+		if (!container.__signalAyuHeadingAnchorBound) {
+			container.addEventListener("click", onAnchorClick);
+			container.__signalAyuHeadingAnchorBound = true;
+		}
+	};
+
+	w.SignalAyuHeadingAnchor = {
+		init: init
+	};
+
+	if (w.document.readyState === "loading") {
+		w.document.addEventListener("DOMContentLoaded", init);
+	} else {
+		init();
+	}
+})(window);
+
+;(function(w) {
 	var DEFAULT_LABEL = "Copy";
 	var COPIED_LABEL = "Copied";
 	var FAILED_LABEL = "Failed";

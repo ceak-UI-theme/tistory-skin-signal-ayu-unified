@@ -3845,6 +3845,41 @@ html[data-theme] .article-view h4 {
   color: var(--text-strong) !important;
 }
 
+html[data-theme] .article-view h2 {
+  scroll-margin-top: 92px;
+}
+
+html[data-theme] .article-view h2 .heading-anchor {
+  display: inline-block;
+  margin-left: 6px;
+  text-decoration: none !important;
+  opacity: 0;
+  font-size: 0.8em;
+  line-height: 1;
+  vertical-align: middle;
+  color: var(--text-muted) !important;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+html[data-theme] .article-view h2:hover .heading-anchor,
+html[data-theme] .article-view h2:focus-within .heading-anchor {
+  opacity: 1;
+}
+
+html[data-theme] .article-view h2 .heading-anchor:hover {
+  color: var(--accent) !important;
+}
+
+@media (max-width: 820px) {
+  html[data-theme] .article-view h2 {
+    scroll-margin-top: 72px;
+  }
+
+  html[data-theme] .article-view h2 .heading-anchor {
+    opacity: 0.6;
+  }
+}
+
 /* 링크(본문만) */
 html[data-theme] .article-view a {
   color: var(--link) !important;
