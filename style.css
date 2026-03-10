@@ -1,5 +1,14 @@
 @charset "UTF-8";
 
+/* ==========================================================================
+   TISTORY SKIN STYLESHEET
+   --------------------------------------------------------------------------
+   1) Base reset + default #1 compatible layout/styles (legacy structure)
+   2) Ayu unified theme extension (tokens + light/dark overrides)
+   3) Dark icon replacement and component-level patches
+   4) Responsive rules
+   ========================================================================== */
+
 /* reset */
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, input, select, textarea, button {
   margin: 0;
@@ -3709,9 +3718,23 @@ html[data-theme="dark"] body {
   font-family: var(--font-body);
 }
 
-/* 본문(.article-view) 폰트는 다크에서만 강제 */
+/* 본문 타이포(다크): 전역 * 강제를 피하고 주요 콘텐츠 태그에 한정 */
 html[data-theme="dark"] .article-view,
-html[data-theme="dark"] .article-view * {
+html[data-theme="dark"] .article-view p,
+html[data-theme="dark"] .article-view li,
+html[data-theme="dark"] .article-view dt,
+html[data-theme="dark"] .article-view dd,
+html[data-theme="dark"] .article-view blockquote,
+html[data-theme="dark"] .article-view figcaption,
+html[data-theme="dark"] .article-view table,
+html[data-theme="dark"] .article-view th,
+html[data-theme="dark"] .article-view td,
+html[data-theme="dark"] .article-view h1,
+html[data-theme="dark"] .article-view h2,
+html[data-theme="dark"] .article-view h3,
+html[data-theme="dark"] .article-view h4,
+html[data-theme="dark"] .article-view h5,
+html[data-theme="dark"] .article-view h6 {
   font-family: var(--font-body) !important;
 }
 
