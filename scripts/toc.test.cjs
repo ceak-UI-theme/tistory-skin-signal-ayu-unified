@@ -111,7 +111,7 @@ test('inline conversion preserves code blocks, links, listeners and copy success
 test('notice CSS never hides the first regular post, with and without notices in both themes', async () => {
   await fixture(async page => {
     await page.addStyleTag({ path: path.join(__dirname, '../style.css') });
-    for (const width of [320, 390, 1440]) {
+    for (const width of [320, 375, 390, 820, 1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       for (const theme of ['light', 'dark']) {
         for (const notice of [false, true]) {

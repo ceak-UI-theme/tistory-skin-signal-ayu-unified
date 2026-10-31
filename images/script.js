@@ -1,4 +1,132 @@
 ;(function(w) {
+  var saved = [];
+  var panels = [];
+  var previousOverflow = '';
+  var focusables = function() {
+    var nodes = [];
+    panels.forEach(function(panel) {
+      if (!panel) return;
+      if (panel.matches('button, a[href], input, [tabindex]')) nodes.push(panel);
+      nodes = nodes.concat(Array.prototype.slice.call(panel.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')));
+    });
+    return nodes.filter(function(el) { return !el.disabled && el.tabIndex >= 0 && el.getClientRects().length && !el.closest('[inert]'); });
+  };
+  var close = function() {
+    if (!panels.length) return;
+    saved.forEach(function(item) { item.el.inert = item.inert; });
+    saved = [];
+    panels = [];
+    w.document.body.style.overflow = previousOverflow;
+  };
+  w.SignalAyuModal = {
+    open: function(roots, background) {
+      close();
+      panels = roots.filter(Boolean);
+      previousOverflow = w.document.body.style.overflow;
+      w.document.body.style.overflow = 'hidden';
+      background.filter(Boolean).forEach(function(el) { saved.push({ el: el, inert: el.inert }); el.inert = true; });
+    },
+    close: close
+  };
+  w.document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab' || !panels.length) return;
+    var nodes = focusables();
+    if (!nodes.length) { e.preventDefault(); return; }
+    var index = nodes.indexOf(w.document.activeElement);
+    if (e.shiftKey && index <= 0) { e.preventDefault(); nodes[nodes.length - 1].focus(); }
+    else if (!e.shiftKey && (index < 0 || index === nodes.length - 1)) { e.preventDefault(); nodes[0].focus(); }
+  });
+})(window);
+
+;(function(w) {
+  var init = function() {
+    w.document.querySelectorAll('.article-view table').forEach(function(table) {
+      if (table.closest('.another_category, .tt-calendar, [data-signal-system-table]')) return;
+      table.classList.add('ayu-content-table');
+      var wrapper = table.parentElement;
+      if (!wrapper.classList.contains('ayu-table-scroll')) {
+        wrapper = w.document.createElement('div');
+        wrapper.className = 'ayu-table-scroll';
+        wrapper.tabIndex = 0;
+        wrapper.setAttribute('role', 'region');
+        wrapper.setAttribute('aria-label', table.caption ? table.caption.textContent.trim() : '본문 표 (가로 스크롤)');
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+  };
+  w.SignalAyuTables = { init: init };
+  if (w.document.readyState === 'loading') w.document.addEventListener('DOMContentLoaded', init);
+  else init();
+})(window);
+
+;(function(w) {
+  var init = function() {
+    var doc = w.document;
+    var menu = doc.querySelector('#dkGnb');
+    var menuButton = doc.querySelector('.btn_menu');
+    var closeButton = doc.querySelector('.btn_close');
+    var menuOpen = false;
+    if (doc.documentElement.__signalControlsBound) return;
+    doc.documentElement.__signalControlsBound = true;
+    var expanded = function(button, value) { if (button) button.setAttribute('aria-expanded', String(value)); };
+    var closeMenu = function(restore) {
+      if (!menuOpen) return;
+      menuOpen = false;
+      doc.body.classList.remove('layer_on');
+      expanded(menuButton, false);
+      expanded(doc.querySelector('.btn_search'), false);
+      menu.removeAttribute('role'); menu.removeAttribute('aria-modal'); menu.removeAttribute('aria-label');
+      w.SignalAyuModal.close();
+      if (restore !== false && menuButton) menuButton.focus();
+    };
+    if (menu && menuButton) {
+      menuButton.addEventListener('click', function() {
+        if (menuOpen) { closeMenu(); return; }
+        menuOpen = true;
+        doc.body.classList.add('layer_on');
+        expanded(menuButton, true);
+        expanded(doc.querySelector('.btn_search'), true);
+        menu.setAttribute('role', 'dialog'); menu.setAttribute('aria-modal', 'true'); menu.setAttribute('aria-label', '사이트 메뉴');
+        w.SignalAyuModal.open([closeButton, menu], [doc.querySelector('#dkHead'), doc.querySelector('#dkContent'), doc.querySelector('#mEtc'), doc.querySelector('#dkFoot'), doc.querySelector('#tocMobileBtn')]);
+        if (closeButton) closeButton.focus();
+      });
+      [closeButton, doc.querySelector('.dimmed_layer')].filter(Boolean).forEach(function(el) { el.addEventListener('click', closeMenu); });
+      w.addEventListener('resize', function() {
+        if (menuOpen && w.innerWidth > 820) {
+          closeMenu(false);
+          var control = menu.querySelector('button');
+          if (control) control.focus();
+        }
+      });
+    }
+    var bindDisclosure = function(rootSelector, buttonSelector, className) {
+      var root = doc.querySelector(rootSelector);
+      var button = root && root.querySelector(buttonSelector);
+      if (!button) return;
+      var close = function() { root.classList.remove(className); expanded(button, false); };
+      button.addEventListener('click', function() { var on = root.classList.toggle(className); expanded(button, on); });
+      root.addEventListener('keydown', function(e) { if (e.key === 'Escape' && root.classList.contains(className)) { e.preventDefault(); e.stopPropagation(); close(); button.focus(); } });
+      root.addEventListener('focusout', function(e) { if (!root.contains(e.relatedTarget)) close(); });
+    };
+    bindDisclosure('.area_profile', '.btn_name', 'on');
+    bindDisclosure('.area_navi', '.btn_cate', 'on');
+    var search = doc.querySelector('.area_search');
+    var searchButton = search && search.querySelector('.btn_search');
+    var input = search && search.querySelector('.tf_search');
+    if (searchButton && input) {
+      searchButton.addEventListener('click', function() { search.classList.add('on'); expanded(searchButton, true); input.focus(); });
+      search.addEventListener('keydown', function(e) { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); search.classList.remove('on'); expanded(searchButton, false); if (menuOpen) closeMenu(); else searchButton.focus(); } });
+      input.addEventListener('blur', function() { if (!input.value) { search.classList.remove('on'); expanded(searchButton, false); } });
+    }
+    doc.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menuOpen) closeMenu(); });
+  };
+  w.SignalAyuControls = { init: init };
+  if (w.document.readyState === 'loading') w.document.addEventListener('DOMContentLoaded', init);
+  else init();
+})(window);
+
+;(function(w) {
 	// Convert only plain text nodes; never rebuild article DOM or code-copy controls.
 	var init = function() {
 		var containers = w.document.querySelectorAll(".article-view .tt_article_useless_p_margin.contents_style");
@@ -114,9 +242,7 @@ w.SignalAyuTheme = {
 			return false;
 		}
 
-		if (!w.T || !w.T.entryInfo) {
-			return false;
-		}
+
 
 		skinView = w.document.querySelector(".skin_view");
 		if (!skinView) {
@@ -134,7 +260,7 @@ w.SignalAyuTheme = {
 
 		// This skin's true post permalink includes a category link with href.
 		categoryLink = skinView.querySelector(".area_title .tit_category a[href]");
-		if (!categoryLink) {
+		if (!categoryLink && !/^(notice|page)$/.test(skinView.getAttribute("data-article-kind") || "")) {
 			return false;
 		}
 
@@ -174,7 +300,10 @@ w.SignalAyuTheme = {
 			usedIds[el.id] = true;
 			return el.id;
 		}
-		var base = slugify(el.textContent);
+		var clone = el.cloneNode(true);
+		var anchor = clone.querySelector(".heading-anchor");
+		if (anchor) anchor.remove();
+		var base = slugify(clone.textContent);
 		var candidate = base;
 		var n = 2;
 		while (usedIds[candidate] || w.document.getElementById(candidate)) {
@@ -315,14 +444,14 @@ w.SignalAyuTheme = {
 		state.headerOffset = (head ? head.offsetHeight : 80) + 12;
 	};
 
-	var scrollToHeading = function(id) {
+	var scrollToHeading = function(id, behavior) {
 		var target = byId(id);
 		if (!target) {
 			return;
 		}
 		updateHeaderOffset();
 		var top = target.getBoundingClientRect().top + w.pageYOffset - state.headerOffset;
-		w.scrollTo({ top: top, behavior: "smooth" });
+		w.scrollTo({ top: top, behavior: behavior || "smooth" });
 	};
 
 	var flattenTree = function(tree) {
@@ -370,16 +499,17 @@ w.SignalAyuTheme = {
 		setActive(activeId);
 	};
 
-	var closeMobile = function() {
+	var closeMobile = function(restoreFocus) {
 		var panel = byId("tocMobilePanel");
 		var backdrop = byId("tocMobileBackdrop");
 		var btn = byId("tocMobileBtn");
 		state.mobileOpen = false;
+		if (w.SignalAyuModal) w.SignalAyuModal.close();
 		if (panel) panel.hidden = true;
 		if (backdrop) backdrop.hidden = true;
 		if (btn) {
 			btn.setAttribute("aria-expanded", "false");
-			btn.focus();
+			if (restoreFocus !== false) btn.focus();
 		}
 	};
 
@@ -388,6 +518,7 @@ w.SignalAyuTheme = {
 		var backdrop = byId("tocMobileBackdrop");
 		var btn = byId("tocMobileBtn");
 		state.mobileOpen = true;
+		if (w.SignalAyuModal) w.SignalAyuModal.open([panel], [w.document.querySelector(".wrap_skin"), byId("tocFloating")]);
 		if (panel) panel.hidden = false;
 		if (backdrop) backdrop.hidden = false;
 		if (btn) btn.setAttribute("aria-expanded", "true");
@@ -405,6 +536,7 @@ w.SignalAyuTheme = {
 			e.preventDefault();
 			var id = link.getAttribute("data-target");
 			scrollToHeading(id);
+			if (w.history && w.history.replaceState) w.history.replaceState(null, "", "#" + encodeURIComponent(id));
 			if (state.mobileOpen) {
 				closeMobile();
 			}
@@ -428,7 +560,14 @@ w.SignalAyuTheme = {
 		if (backdrop) backdrop.addEventListener("click", closeMobile);
 
 		w.addEventListener("scroll", updateActiveByScroll, { passive: true });
-		w.addEventListener("resize", updateActiveByScroll);
+		w.addEventListener("resize", function() {
+			if (state.mobileOpen && w.innerWidth >= 1280) {
+				closeMobile(false);
+				var link = w.document.querySelector("#tocNavDesktop a");
+				if (link) link.focus();
+			}
+			updateActiveByScroll();
+		});
 		w.document.addEventListener("keydown", function(e) {
 			if (e.key === "Escape" && state.mobileOpen) {
 				closeMobile();
@@ -467,6 +606,13 @@ w.SignalAyuTheme = {
 		state.entries = flattenTree(tree);
 		bindEvents();
 		updateActiveByScroll();
+		if (!state.hashAligned && w.location.hash) {
+			state.hashAligned = true;
+			try {
+				var initialId = decodeURIComponent(w.location.hash.slice(1));
+				w.requestAnimationFrame(function() { scrollToHeading(initialId, "auto"); });
+			} catch (e) {} // A malformed external hash must not interrupt initialization.
+		}
 	};
 
 	w.SignalAyuToc = {
@@ -554,7 +700,7 @@ w.SignalAyuTheme = {
 		e.preventDefault();
 		scrollToHeading(id, "smooth");
 		if (w.history && typeof w.history.replaceState === "function") {
-			w.history.replaceState(null, "", "#" + id);
+			w.history.replaceState(null, "", "#" + encodeURIComponent(id));
 		} else {
 			w.location.hash = id;
 		}
@@ -839,91 +985,6 @@ w.SignalAyuTheme = {
 
 	var Area = {};
 
-	Area.Skin = (function() {
-		var $body = $(document.body),
-			$areaSkin = $(".wrap_skin");
-
-		var openMenu = function() {
-			$body.addClass("layer_on");
-		};
-
-		var closeMenu = function() {
-			$body.removeClass("layer_on");
-		};
-
-		var init = function() {
-			$areaSkin.on("click", ".btn_menu", openMenu);
-			$areaSkin.on("click", ".btn_close, .dimmed_layer", closeMenu);
-			$(document).on("keydown", function(e) {
-				if (e.key === "Escape") {
-					closeMenu();
-				}
-			});
-		};
-
-		return {
-			init: init
-		}
-	})();
-
-	Area.Profile = (function() {
-		var $areaProfile = $(".area_profile");
-
-		var toggleProfileMenu = function() {
-			$areaProfile.toggleClass("on");
-		};
-
-		var init = function() {
-			$areaProfile.on("click", ".btn_name", toggleProfileMenu);
-		};
-
-		return {
-			init: init
-		}
-	})();
-
-	Area.Category = (function() {
-		var $areaNavi = $(".area_navi");
-
-		var toggleCategory = function() {
-			$areaNavi.toggleClass("on");
-		};
-
-		var init = function() {
-			$areaNavi.on("click", ".btn_cate", toggleCategory);
-		};
-
-		return {
-			init: init
-		}
-	})();
-
-
-	Area.Search = (function() {
-		var $areaSearch = $(".area_search"),
-			$input = $areaSearch.find(".tf_search");
-
-		var openSearch = function() {
-			$areaSearch.addClass("on");
-			$input.focus();
-		};
-
-		var leaveSearch = function() {
-			if ($input.val() == "") {
-				$areaSearch.removeClass("on");
-			}
-		};
-
-		var init = function() {
-			$areaSearch.on("click", ".btn_search", openSearch);
-			$input.on("blur", leaveSearch);
-		};
-
-		return {
-			init: init
-		}
-	})();
-
 	Area.Comment = (function() {
 		var $btnOpen = $(".btn_reply"),
 			$fieldReply = $(".fld_reply");
@@ -1117,10 +1178,6 @@ w.SignalAyuTheme = {
 	})();
 
 	Area.init = function() {
-		Area.Skin.init();
-		Area.Profile.init();
-		Area.Category.init();
-		Area.Search.init();
 		Area.Comment.init();
 		Area.ReadingTime.init();
 		Area.ReadingProgress.init();

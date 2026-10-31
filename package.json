@@ -2,9 +2,15 @@
   "name": "signal-ayu-unified",
   "private": true,
   "scripts": {
-    "test": "node --test scripts/toc.test.cjs"
+    "test": "node --test scripts/*.test.cjs",
+    "check": "node scripts/check.cjs",
+    "verify:zip": "python3 scripts/verify_zip.py",
+    "build": "bash scripts/build_skin_zip.sh"
   },
   "devDependencies": {
-    "playwright": "1.62.1"
+    "jquery": "^3.5.1",
+    "parse5": "^8.0.1",
+    "playwright": "1.62.1",
+    "postcss": "^8.5.32"
   }
 }

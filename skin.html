@@ -56,10 +56,10 @@
           <a class="link_profile" href="/"><img src="[##_image_##]" width="50" height="50" class="img_profile"
               alt="프로필사진"></a>
           <div class="info_profile">
-            <button type="button" class="btn_name">[##_blogger_##]
+            <button type="button" class="btn_name" aria-expanded="false" aria-controls="profileLinks">[##_blogger_##]
               <span class="ico_skin ico_name"></span>
             </button>
-            <ul class="list_name">
+            <ul id="profileLinks" class="list_name">
               <li><a href="[##_owner_url_##]/entry/post" class="link_name">글쓰기</a></li>
               <li><a href="[##_owner_url_##]" class="link_name">관리</a></li>
               <li class="box_division"><a href="[##_taglog_link_##]" class="link_name">태그</a></li>
@@ -73,7 +73,7 @@
           </div>
         </div>
 
-        <button type="button" class="btn_menu">
+        <button type="button" class="btn_menu" aria-expanded="false" aria-controls="dkGnb">
           <span class="ico_skin ico_menu">카테고리 메뉴열기</span>
         </button>
       </div>
@@ -91,10 +91,10 @@
         </button>
         <s_search>
           <div class="area_search">
-            <button type="button" class="btn_search">
+            <button type="button" class="btn_search" aria-expanded="false" aria-controls="searchForm">
               <span class="ico_skin ico_search">검색하기</span>
             </button>
-            <form action="#" method="get" class="frm_search" onsubmit="[##_search_onclick_submit_##]">
+            <form action="#" method="get" id="searchForm" class="frm_search" onsubmit="[##_search_onclick_submit_##]">
               <fieldset>
                 <legend class="screen_out">검색하기 폼</legend>
                 <label for="tfSearch" class="ico_skin lab_search">블로그 내 검색</label>
@@ -105,9 +105,9 @@
           </div>
         </s_search>
         <div role="navigation" class="area_navi">
-          <button type="button" class="btn_cate">CATEGORY <span class="ico_skin ico_cate"></span></button>
+          <button type="button" class="btn_cate" aria-expanded="false" aria-controls="categoryLinks">CATEGORY <span class="ico_skin ico_cate"></span></button>
 
-          <div class="list_cate">
+          <div id="categoryLinks" class="list_cate">
             [##_category_list_##]
             <ul class="menu_profile">
               <li><a href="[##_guestbook_link_##]">방명록</a></li>
@@ -145,14 +145,9 @@
                     data-tiara-provider="[##_title_##]"
                     data-tiara-plink="[##_notice_rep_link_##]"
                     data-tiara-id="[##_notice_rep_link_##]">
+                    <span class="notice-label">공지</span>
                     <strong class="tit_post">[##_notice_rep_title_##]</strong>
-                    <p class="txt_post">[##_notice_rep_summary_##]</p>
                   </a>
-                  <div class="detail_info">
-                    <a class="link_cate">공지사항</a>
-                    <span class="txt_bar"></span>
-                    [##_notice_rep_date_##]
-                  </div>
                 </div>
               </s_rct_notice_rep>
             </div>
@@ -189,7 +184,7 @@
               </s_index_article_rep>
 
               <s_permalink_article_rep>
-                <div class="skin_view">
+                <div class="skin_view" data-article-kind="notice">
                   <h2 class="screen_out">티스토리 뷰</h2>
                   <div class="area_title">
                     <strong class="tit_category"><a>공지사항</a></strong>
@@ -209,7 +204,7 @@
           <s_page_rep>
             <div class="article_skin">
               <s_permalink_article_rep>
-                <div class="skin_view">
+                <div class="skin_view" data-article-kind="page">
                   <h2 class="screen_out">티스토리 뷰</h2>
                   <div class="area_title">
                     <h3 class="tit_post"><a href="[##_article_rep_link_##]">[##_article_rep_title_##]</a></h3>
@@ -251,7 +246,7 @@
               </s_index_article_rep>
 
               <s_permalink_article_rep>
-                <div class="skin_view">
+                <div class="skin_view" data-article-kind="protected">
                   <h2 class="screen_out">티스토리 뷰</h2>
                   <div class="area_title">
                     <strong class="tit_category"><a>보호글</a></strong>
@@ -273,7 +268,7 @@
             </div>
 
           </s_article_protected>
-          [##_revenue_list_upper_##]
+          <div class="list-ad-slot">[##_revenue_list_upper_##]</div>
           <s_article_rep>
             <div class="article_skin">
               <s_index_article_rep>
@@ -305,7 +300,7 @@
               </s_index_article_rep>
 
               <s_permalink_article_rep>
-                <div class="skin_view">
+                <div class="skin_view" data-article-kind="post">
                   <h2 class="screen_out">티스토리 뷰</h2>
                   <div class="area_title">
                     <strong class="tit_category"><a
@@ -336,7 +331,7 @@
               </s_permalink_article_rep>
             </div>
           </s_article_rep>
-          [##_revenue_list_lower_##]
+          <div class="list-ad-slot">[##_revenue_list_lower_##]</div>
           <s_tag>
             <div class="area_list">
               <div class="tit_category">
@@ -512,7 +507,7 @@
     Contents
   </button>
   <div id="tocMobileBackdrop" class="toc-mobile-backdrop" hidden></div>
-  <section id="tocMobilePanel" class="toc-mobile-panel" aria-label="모바일 목차" hidden>
+  <section id="tocMobilePanel" class="toc-mobile-panel" role="dialog" aria-modal="true" aria-label="모바일 목차" hidden>
     <div class="toc-mobile-head">
       <strong class="toc-title">Contents</strong>
       <button id="tocMobileClose" class="toc-mobile-close" type="button" aria-label="목차 닫기">닫기</button>
@@ -520,7 +515,7 @@
     <nav id="tocNavMobile" class="toc-nav" aria-label="본문 목차"></nav>
   </section>
 
-  <script src="./images/script.js?v=2.1.1"></script>
+  <script src="./images/script.js?v=2.1.2"></script>
   <script>
     (function (w, $) {
       if (w.SignalAyuInlineCode) w.SignalAyuInlineCode.init();

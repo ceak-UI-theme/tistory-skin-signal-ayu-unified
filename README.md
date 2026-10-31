@@ -94,3 +94,23 @@ Signal Ayu Unified는 ceak에 의해 수정 및 통합 설계되었습니다.
 - 패키징: `bash scripts/build_skin_zip.sh`
 - 배포 시 `index.xml` 버전과 HTML의 JS 캐시 버전을 함께 갱신합니다.
 - 운영본 전용 커스터마이징은 운영 파일을 백업·비교한 뒤 별도로 병합합니다.
+
+## v2.1.2 안정화 후보
+
+최근 공지 카드는 공식 지원 범위인 제목·링크만 표시합니다. 요약·날짜는 일반 공지 상세 템플릿에서 유지합니다.
+본문 표는 시스템 표를 제외하고 가로 스크롤 영역으로 감싸며, 명시적인 셀 인라인 스타일은 보존합니다.
+목차는 제목이 두 개 이상인 일반 글·공지·정적 페이지에 표시하고, 잠긴 보호글과 목록에서는 숨깁니다.
+
+검증 환경은 Node.js 22 이상 및 Python 3입니다. `npm ci`와 `npx playwright install chromium` 후 다음을 실행합니다.
+
+```sh
+npm run check
+npm test
+npm run build
+npm run verify:zip
+```
+
+이미 같은 버전 ZIP이 있을 때 빌드는 `-local-날짜.zip`을 생성합니다. 이 파일은
+`python3 scripts/verify_zip.py releases/생성된파일.zip`으로 따로 검증할 수 있습니다.
+GitHub Actions는 커밋된 후보 ZIP과 새로 빌드한 ZIP을 모두 검증합니다.
+운영 확인 절차와 자동 검증 범위는 [v2.1.2 검증 보고서](docs/STABILIZATION_v2.1.2.md)를 참조하세요.
