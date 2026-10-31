@@ -3570,7 +3570,7 @@ hr[data-ke-style='style8'],
    - Typography and code block optimization
    - Mobile refinement
 
-   Version: v2.1.0
+   Version: v2.1.1
    Maintainer: ceak
    Website: https://ceak.tistory.com
 
@@ -5273,4 +5273,150 @@ html[data-theme="light"] .reading_progress {
   .reading_progress {
     top: 59px;
   }
+}
+
+
+/* ===== Top notice block on home/list ===== */
+.top_notice_wrap {
+  margin-bottom: 10px;
+}
+
+.top_notice_content {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elev);
+  padding: 28px 30px;
+}
+
+.top_notice_content .link_post {
+  display: block;
+  text-decoration: none !important;
+}
+
+.top_notice_content .tit_post {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: initial;
+}
+
+.top_notice_content .txt_post {
+  max-height: none;
+  -webkit-line-clamp: initial;
+}
+
+.top_notice_content .detail_info {
+  margin-top: 14px;
+}
+
+.top_notice_content .detail_info .link_cate {
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .top_notice_content {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+@media only screen and (max-width:820px) {
+  .top_notice_wrap {
+    width: 100%;
+  }
+
+  .top_notice_content {
+    margin: 0 15px;
+    padding: 18px 18px 16px;
+    border-radius: 10px;
+  }
+
+  .top_notice_content .tit_post {
+    font-size: 18px;
+  }
+
+  .top_notice_content .txt_post {
+    margin-top: 6px;
+  }
+}
+
+
+/* ===== 상단 공지 배너 강제 스타일 ===== */
+/* 상단 공지 블록 자체 간격 */
+#dkContent > #cMain > .top_notice_wrap {
+  margin-bottom: 20px !important;
+}
+
+/* 공지 카드 박스 */
+#dkContent > #cMain > .top_notice_wrap .list_content {
+  padding: 18px 20px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-elev) !important;
+  min-height: auto !important;
+}
+
+/* 공지 제목 */
+#dkContent > #cMain > .top_notice_wrap .tit_post {
+  display: block !important;
+  font-size: 18px !important;
+  line-height: 1.4 !important;
+  font-weight: 700 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+/* 공지 요약 */
+#dkContent > #cMain > .top_notice_wrap .txt_post {
+  margin-top: 8px !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+  color: var(--text-dim) !important;
+  max-height: none !important;
+
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+/* 핵심: 공지 메타 숨김 */
+#dkContent > #cMain > .top_notice_wrap .detail_info {
+  display: none !important;
+}
+
+/* 썸네일 있으면 숨김 */
+#dkContent > #cMain > .top_notice_wrap .thumbnail_post {
+  display: none !important;
+}
+
+/* 모바일에서 조금 더 타이트하게 */
+@media only screen and (max-width: 820px) {
+  #dkContent > #cMain > .top_notice_wrap .list_content {
+    padding: 16px 16px !important;
+    border-radius: 12px !important;
+  }
+
+  #dkContent > #cMain > .top_notice_wrap .tit_post {
+    font-size: 16px !important;
+  }
+
+  #dkContent > #cMain > .top_notice_wrap .txt_post {
+    font-size: 13px !important;
+  }
+}
+
+#cMain {
+  padding-top: 16px !important;
+}
+/* Preserve the operating dark notice gradient while allowing the light theme. */
+html[data-theme="dark"] #dkContent > #cMain > .top_notice_wrap .list_content {
+  background: linear-gradient(180deg, #0f1720, #0b1117) !important;
+}
+
+/* Keyboard focus for skin controls, including theme, search, menu and TOC. */
+html[data-theme] button:focus-visible,
+html[data-theme] input:focus-visible,
+html[data-theme] select:focus-visible,
+html[data-theme] textarea:focus-visible,
+html[data-theme] a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }

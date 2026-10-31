@@ -1,4 +1,46 @@
 ;(function(w) {
+	// Convert only plain text nodes; never rebuild article DOM or code-copy controls.
+	var init = function() {
+		var containers = w.document.querySelectorAll(".article-view .tt_article_useless_p_margin.contents_style");
+		for (var i = 0; i < containers.length; i++) {
+			var walker = w.document.createTreeWalker(containers[i], 4);
+			var nodes = [];
+			var node;
+			while ((node = walker.nextNode())) {
+				if (node.nodeValue.indexOf("`") < 0) continue;
+				if (node.parentElement.closest("pre, code, a, button, script, style, textarea, select, figure, svg, math, .ayu-code-wrap, [contenteditable]")) continue;
+				nodes.push(node);
+			}
+			for (var j = 0; j < nodes.length; j++) {
+				node = nodes[j];
+				var text = node.nodeValue;
+				var pattern = /`([^`\r\n]+)`/g;
+				var fragment = w.document.createDocumentFragment();
+				var last = 0;
+				var match;
+				while ((match = pattern.exec(text))) {
+					if (text.charAt(match.index - 1) === "`" || text.charAt(pattern.lastIndex) === "`") continue;
+					fragment.appendChild(w.document.createTextNode(text.slice(last, match.index)));
+					var code = w.document.createElement("code");
+					code.textContent = match[1];
+					fragment.appendChild(code);
+					last = pattern.lastIndex;
+				}
+				if (!last) continue;
+				fragment.appendChild(w.document.createTextNode(text.slice(last)));
+				node.parentNode.replaceChild(fragment, node);
+			}
+		}
+	};
+	w.SignalAyuInlineCode = { init: init };
+	if (w.document.readyState === "loading") {
+		w.document.addEventListener("DOMContentLoaded", init);
+	} else {
+		init();
+	}
+})(window);
+
+;(function(w) {
 	var KEY = "theme",
 		DEFAULT_THEME = "dark",
 		root = w.document.documentElement;
@@ -128,7 +170,7 @@ w.SignalAyuTheme = {
 	};
 
 	var ensureHeadingId = function(el, usedIds) {
-		if (el.id) {
+		if (el.id && !usedIds[el.id] && w.document.getElementById(el.id) === el) {
 			usedIds[el.id] = true;
 			return el.id;
 		}
@@ -159,7 +201,7 @@ w.SignalAyuTheme = {
 
 	var buildEntries = function(container) {
 		var mode = pickHeadingMode(container);
-		var usedIds = {};
+		var usedIds = Object.create(null);
 		var raw = [];
 		var nodes;
 		var i;
@@ -177,7 +219,10 @@ w.SignalAyuTheme = {
 			if (tag !== mode.topTag && tag !== mode.childTag) {
 				continue;
 			}
-			var text = (el.textContent || "").trim();
+			var clone = el.cloneNode(true);
+			var anchors = clone.querySelectorAll(".heading-anchor");
+			for (var j = 0; j < anchors.length; j++) anchors[j].remove();
+			var text = (clone.textContent || "").trim();
 			if (!text) {
 				continue;
 			}
@@ -332,7 +377,10 @@ w.SignalAyuTheme = {
 		state.mobileOpen = false;
 		if (panel) panel.hidden = true;
 		if (backdrop) backdrop.hidden = true;
-		if (btn) btn.setAttribute("aria-expanded", "false");
+		if (btn) {
+			btn.setAttribute("aria-expanded", "false");
+			btn.focus();
+		}
 	};
 
 	var openMobile = function() {
@@ -343,6 +391,8 @@ w.SignalAyuTheme = {
 		if (panel) panel.hidden = false;
 		if (backdrop) backdrop.hidden = false;
 		if (btn) btn.setAttribute("aria-expanded", "true");
+		var closeBtn = byId("tocMobileClose");
+		if (closeBtn) closeBtn.focus();
 	};
 
 	var bindEvents = function() {
@@ -393,8 +443,9 @@ w.SignalAyuTheme = {
 			return;
 		}
 
+		if (w.SignalAyuHeadingAnchor) w.SignalAyuHeadingAnchor.init();
 		var tree = buildEntries(container);
-		if (tree.length < 2) {
+		if (!tree.length) {
 			return;
 		}
 
@@ -440,7 +491,7 @@ w.SignalAyuTheme = {
 	};
 
 	var buildIdCountMap = function(scope) {
-		var counts = {};
+		var counts = Object.create(null);
 		if (!scope) return counts;
 		var nodes = scope.querySelectorAll("[id]");
 		var i;
@@ -516,14 +567,18 @@ w.SignalAyuTheme = {
 		var headings = container.querySelectorAll("h2");
 		if (!headings.length) return;
 
-		var idCounts = buildIdCountMap(container);
-		var assignedIds = {};
+		var idCounts = buildIdCountMap(w.document);
+		var assignedIds = Object.create(null);
 		var i;
 		for (i = 0; i < headings.length; i++) {
 			var h2 = headings[i];
 			var id = ensureId(h2, idCounts, assignedIds);
 			if (!id) continue;
-			if (h2.querySelector(".heading-anchor")) continue;
+			var existingAnchor = h2.querySelector(".heading-anchor");
+			if (existingAnchor) {
+				existingAnchor.setAttribute("href", "#" + id);
+				continue;
+			}
 
 			var a = w.document.createElement("a");
 			a.className = "heading-anchor";

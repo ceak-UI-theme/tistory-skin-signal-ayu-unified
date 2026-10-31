@@ -84,3 +84,13 @@ Light / Dark는 동일한 의미 체계를 공유하며,
 원 저작권은 해당 제작자에게 있습니다.
 
 Signal Ayu Unified는 ceak에 의해 수정 및 통합 설계되었습니다.
+
+## 소스 및 검증
+
+- 배포 원본은 루트의 `skin.html`, `style.css`, `images/`입니다.
+- `my/skin.html`은 개인 작업용 사본이며 릴리즈 ZIP에 포함하지 않습니다.
+- 최초 테스트 준비: `npm install`, `npx playwright install chromium`
+- 회귀 검사: `npm test` (설치된 Edge를 사용하려면 `TEST_BROWSER_CHANNEL=msedge` 지정)
+- 패키징: `bash scripts/build_skin_zip.sh`
+- 배포 시 `index.xml` 버전과 HTML의 JS 캐시 버전을 함께 갱신합니다.
+- 운영본 전용 커스터마이징은 운영 파일을 백업·비교한 뒤 별도로 병합합니다.

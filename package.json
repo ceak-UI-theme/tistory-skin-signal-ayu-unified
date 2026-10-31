@@ -1,0 +1,10 @@
+{
+  "name": "signal-ayu-unified",
+  "private": true,
+  "scripts": {
+    "test": "node --test scripts/toc.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

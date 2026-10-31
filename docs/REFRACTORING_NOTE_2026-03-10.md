@@ -14,7 +14,7 @@
 - This remains inline intentionally because it must run before external scripts.
 
 ### What moved to external JS
-- Theme toggle runtime logic moved into `images/script.js` as `Area.Theme`:
+- Theme toggle runtime logic moved into `images/script.js` as `window.SignalAyuTheme`:
   - Theme toggle click binding.
   - Theme apply + `localStorage` persistence.
   - Toggle button icon/label sync.
@@ -33,7 +33,7 @@
   - Kept code font override rules unchanged.
 
 ## Asset review
-- `images/font.css` was not referenced by `skin.html` or `style.css` and was removed in `v2.0.3`.
+- Correction (2026-10-31): `images/font.css` remains in the repository and is referenced by `skin.html`. The earlier removal statement was inaccurate. Keep the asset until its font usage is reviewed.
 
 ## Intentionally not changed
 - No Tistory placeholder renaming/removal.
@@ -43,6 +43,6 @@
 
 ## Migration summary
 - Removed bottom inline theme toggle script from `skin.html`.
-- Added `Area.Theme` module in `images/script.js`.
+- Added `window.SignalAyuTheme` module in `images/script.js`.
 - Added `aria-pressed` sync for theme toggle accessibility.
 - Narrowed dark-mode article typography selector scope in `style.css`.

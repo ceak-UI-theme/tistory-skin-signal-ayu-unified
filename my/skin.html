@@ -64,6 +64,9 @@
               <li><a href="[##_owner_url_##]" class="link_name">관리</a></li>
               <li class="box_division"><a href="[##_taglog_link_##]" class="link_name">태그</a></li>
               <li><a href="[##_guestbook_link_##]" class="link_name">방명록</a></li>
+              <li><a href="/pages/about" class="link_name">About</a></li>
+              <li><a href="/pages/privacy" class="link_name">Privacy</a></li>
+              <li><a href="/pages/contact" class="link_name">Contact</a></li>
               <li><a href="[##_rss_url_##]" class="link_name">RSS</a></li>
             </ul>
             <p class="txt_condition">[##_title_##]</p>
@@ -108,6 +111,9 @@
             [##_category_list_##]
             <ul class="menu_profile">
               <li><a href="[##_guestbook_link_##]">방명록</a></li>
+              <li><a href="/pages/about" class="link_name">About</a></li>
+              <li><a href="/pages/privacy" class="link_name">Privacy</a></li>
+              <li><a href="/pages/contact" class="link_name">Contact</a></li>
             </ul>
           </div>
         </div>
@@ -125,6 +131,32 @@
 
       <div id="dkContent" class="cont_skin" role="main">
         <div id="cMain">
+
+          <s_rct_notice>
+            <div class="article_skin top_notice_wrap">
+              <s_rct_notice_rep>
+                <div class="list_content top_notice_content">
+                  <a href="[##_notice_rep_link_##]" class="link_post"
+                    data-tiara-action-name="공지상단_클릭"
+                    data-tiara-action-kind="ClickContent"
+                    data-tiara-copy="[##_notice_rep_title_##]"
+                    data-tiara-click_url="[##_blog_link_##][##_notice_rep_link_##]"
+                    data-tiara-name="[##_notice_rep_title_##]"
+                    data-tiara-provider="[##_title_##]"
+                    data-tiara-plink="[##_notice_rep_link_##]"
+                    data-tiara-id="[##_notice_rep_link_##]">
+                    <strong class="tit_post">[##_notice_rep_title_##]</strong>
+                    <p class="txt_post">[##_notice_rep_summary_##]</p>
+                  </a>
+                  <div class="detail_info">
+                    <a class="link_cate">공지사항</a>
+                    <span class="txt_bar"></span>
+                    [##_notice_rep_date_##]
+                  </div>
+                </div>
+              </s_rct_notice_rep>
+            </div>
+          </s_rct_notice>
 
           <s_notice_rep>
             <div class="article_skin">
@@ -241,10 +273,9 @@
             </div>
 
           </s_article_protected>
-
+          [##_revenue_list_upper_##]
           <s_article_rep>
             <div class="article_skin">
-
               <s_index_article_rep>
                 <div class="list_content">
                   <s_article_rep_thumbnail>
@@ -305,7 +336,7 @@
               </s_permalink_article_rep>
             </div>
           </s_article_rep>
-
+          [##_revenue_list_lower_##]
           <s_tag>
             <div class="area_list">
               <div class="tit_category">
@@ -364,30 +395,6 @@
           <div id="mEtc" class="wrap_etc">
             <div class="inner_aside">
               <s_sidebar>
-                <s_sidebar_element>
-                  <!-- 공지사항 -->
-                  <s_rct_notice>
-                    <div class="box_aside">
-                      <strong>공지사항</strong>
-                      <ul class="list_board">
-                        <s_rct_notice_rep>
-                          <li>
-                            <a href="[##_notice_rep_link_##]" class="link_board"
-                              data-tiara-action-name="블로그공지_클릭"
-                              data-tiara-action-kind="ClickContent"
-                              data-tiara-copy="[##_notice_rep_title_##]"
-                              data-tiara-click_url="[##_blog_link_##][##_notice_rep_link_##]"
-                              data-tiara-name="[##_notice_rep_title_##]"
-                              data-tiara-provider="[##_title_##]"
-                              data-tiara-plink="[##_notice_rep_link_##]"
-                              data-tiara-id="[##_notice_rep_link_##]"
-                            >[##_notice_rep_title_##]</a>
-                          </li>
-                        </s_rct_notice_rep>
-                      </ul>
-                    </div>
-                  </s_rct_notice>
-                </s_sidebar_element>
 
 
                 <s_sidebar_element>
@@ -501,7 +508,7 @@
     <nav id="tocNavDesktop" class="toc-nav" aria-label="본문 목차"></nav>
   </aside>
 
-  <button id="tocMobileBtn" class="toc-mobile-btn" type="button" aria-label="목차 열기" aria-expanded="false" hidden>
+  <button id="tocMobileBtn" class="toc-mobile-btn" type="button" aria-controls="tocMobilePanel" aria-label="목차 열기" aria-expanded="false" hidden>
     Contents
   </button>
   <div id="tocMobileBackdrop" class="toc-mobile-backdrop" hidden></div>
@@ -513,9 +520,10 @@
     <nav id="tocNavMobile" class="toc-nav" aria-label="본문 목차"></nav>
   </section>
 
-  <script src="./images/script.js?v=2.1.0"></script>
+  <script src="./images/script.js?v=2.1.1"></script>
   <script>
     (function (w, $) {
+      if (w.SignalAyuInlineCode) w.SignalAyuInlineCode.init();
       if (w.SignalAyuTheme && typeof w.SignalAyuTheme.init === 'function') {
         w.SignalAyuTheme.init();
       }
@@ -527,6 +535,7 @@
       }
     })(window, window.jQuery);
   </script>
+
 </body>
 
 </html>

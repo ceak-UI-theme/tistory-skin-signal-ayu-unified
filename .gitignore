@@ -1,3 +1,4 @@
 .DS_Store
 releases/.DS_Store
 releases/Signal-Ayu-Unified-v*/
+node_modules/
